@@ -1,0 +1,215 @@
+import React, { Component } from 'react';
+// import TodoInput from './TodoInput';
+import './App.css';
+import Todo from './Todo';
+
+var todos = [
+  {
+    todoTitle: 'Todo 1',
+    todoOwner: 'Mudita',
+    todoDescription: 'Learn React JS',
+    todoPriority: 'high'
+  },
+  {
+    todoTitle: 'Todo 2',
+    todoOwner: 'Mudita',
+    todoDescription: 'Create React Todo app',
+    todoPriority: 'high'
+  },
+  {
+    todoTitle: 'Todo 3',
+    todoOwner: 'Mudita',
+    todoDescription: 'Fly kites for Dashain',
+    todoPriority: 'low'
+  }
+];
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      todos: []
+    };
+    this.handleAddTodo = this.handleAddTodo.bind(this);
+  }
+
+  componentDidMount() {
+    ('http://localhost:9876/api/users/42407de9-6d6d-4017-902e-bb84800650ed/todos').then(response=> response.json())
+    .then()
+  }
+
+  handleRemoveTodo(index) {
+    this.setState({
+      todos: this.state.todos.filter(function(e, i) {
+        return i !== index;
+      })
+    });
+  }
+  handleAddTodo(todo) {
+    this.setState({ todos: [...this.state.todos, todo] });
+  }
+
+  render() {
+    return (
+      <div className="container">
+        <TodoInput onAddTodo={this.handleAddTodo} />>
+        <Todo />
+        <h4>
+          Todo Count: <span className="badge">{this.state.todos.length}</span>
+        </h4>
+        <ul className="list-group">
+          {this.state.todos.map((todo, index) => (
+            <li className="list-group-item" key={index}>
+              <h4 className="list-group-item-heading">
+                {todo.todoTitle}
+                <small>
+                  <span className="label label-info">{todo.todoPriority}</span>
+                </small>
+              </h4>
+              <p>
+                <span className="glyphicon glyphicon-user" />
+                {todo.todoOwner}
+              </p>
+              <p>{todo.todoDescription}</p>
+
+              <button
+                classname="btn btn-danger btn-sm"
+                onClick={this.handleRemoveTodo.bind(this, index)}
+              >
+                <span className="glyphicon glyphicon-trash" />Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+class TodoInput extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      todoTitle: '',
+      todoOwner: '',
+      todoDescription: '',
+      todoPriority: 'Lowest'
+    };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleSubmit(event) {
+    //This is done to prevent the default behavior of HTML forms which is to refresh the page after each submit.
+    event.preventDefault();
+    this.props.onAddTodo(this.state);
+    this.setState({
+      todoTitle: '',
+      todoOwner: '',
+      todoDescription: '',
+      todoPriority: 'Lowest'
+    });
+  }
+  render() {
+    return (
+      <div>
+        <h4>Add new Todo</h4>
+        <form className="form-horizontal" onSubmit={this.handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="inputTodoTitle" className="col-sm-2 control-label">
+              Todo
+            </label>
+            <div className="col-sm-10">
+              <input
+                name="todoTitle"
+                type="text"
+                className="form-control"
+                id="inputTodoTitle"
+                value={this.state.todoTitle}
+                onChange={this.handleInputChange}
+                placeholder="Title"
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="inputTodoOwner" className="col-sm-2 control-label">
+              Owner
+            </label>
+            <div className="col-sm-10">
+              <input
+                name="todoOwner"
+                type="text"
+                className="form-control"
+                id="inputTodoOwner"
+                value={this.state.todoOwner}
+                onChange={this.handleInputChange}
+                placeholder="Owner"
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label
+              htmlFor="inputTodoDescription"
+              className="col-sm-2 control-label"
+            >
+              Description
+            </label>
+            <div className="col-sm-10">
+              <textarea
+                name="todoDescription"
+                className="form-control"
+                rows="3"
+                id="inputTodoDescription"
+                value={this.state.todoDescription}
+                onChange={this.handleInputChange}
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label
+              htmlFor="inputTodoPriority"
+              className="col-sm-2 control-label"
+            >
+              Priority
+            </label>
+            <div className="col-sm-10">
+              <select
+                name="todoPriority"
+                className="form-control"
+                id="inputTodoPriority"
+                value={this.state.todoPriority}
+                onChange={this.handleInputChange}
+              >
+                <option>Lowest</option>
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+                <option>Highest</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <div className="col-sm-offset-2 col-sm-10">
+              <button type="submit" className="btn btn-success">
+                Add Todo
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default App;
